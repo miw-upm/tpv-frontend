@@ -1,0 +1,17 @@
+<mat-card>
+    <mat-card-title>
+        <mat-icon>search</mat-icon>
+        Filters
+    </mat-card-title>
+    <mat-card-content>
+        <app-filter-input [(value)]="providerSearch.company" title="Company"></app-filter-input>
+        <app-filter-input [(value)]="providerSearch.phone" title="Phone"></app-filter-input>
+        <app-filter-input [(value)]="providerSearch.note" title="Note"></app-filter-input>
+        <button (click)="search()" mat-stroked-button>
+            <mat-icon>search</mat-icon>
+            Find
+        </button>
+    </mat-card-content>
+</mat-card>
+<app-crud (create)="create()" (read)="read($event)" (update)="update($event)"
+          [data]="providers" [title]="title"></app-crud>
