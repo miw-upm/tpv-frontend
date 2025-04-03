@@ -12,7 +12,6 @@ import {MatInput} from '@angular/material/input';
 
 import {AuthService} from "@core/services/auth.service";
 import {FooterComponent} from '@common/components/footer.component';
-import {LoginDialogComponent} from "@common/dialogs/login-dialog.component";
 
 @Component({
     standalone: true,
@@ -31,9 +30,7 @@ export class HomeComponent {
     }
 
     login(): void {
-        this.dialog.open(LoginDialogComponent)
-            .afterClosed()
-            .subscribe(() => this.username = this.authService.getName());
+        this.authService.login();
     }
 
     logout(): void {

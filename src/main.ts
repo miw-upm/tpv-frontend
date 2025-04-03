@@ -9,7 +9,7 @@ import {routes} from "./app/app.routes";
 
 export const authConfig: AuthConfig = {
     issuer: 'http://localhost:8080/tpv-user',
-    redirectUri: window.location.origin,
+    redirectUri: window.location.origin, // http://localhost:4200
     clientId: 'spa-client-id',
     responseType: 'code',
     scope: 'admin manager operator customer',
