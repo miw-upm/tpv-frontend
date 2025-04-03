@@ -22,7 +22,13 @@ export const authConfig: AuthConfig = {
             provideZoneChangeDetection({eventCoalescing: true}),
             provideAnimationsAsync(),
             provideHttpClient(),
-            importProvidersFrom(OAuthModule.forRoot()),
+            importProvidersFrom(OAuthModule.forRoot({
+                    resourceServer: {
+                        allowedUrls: ['http://localhost'], // URLs a las que se añade el token
+                        sendAccessToken: true
+                    }
+                }
+            )),
             provideRouter(routes)
         ]
     });
