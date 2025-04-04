@@ -10,12 +10,13 @@ export class AuthService {
     }
 
     login(): void {
+        console.log('Login pulsado...');
         this.oauthService.initLoginFlow();
     }
 
     logout(): void {
         this.oauthService.logOut();
-        this.router.navigate(['']).then();
+        console.log('Logout pulsado...' + this.isAuthenticated());
     }
 
     isAuthenticated(): boolean {
@@ -23,7 +24,9 @@ export class AuthService {
     }
 
     hasRoles(roles: Role[]): boolean {
-        return this.isAuthenticated(); //TODO...
+        const claims = this.oauthService.getIdentityClaims();
+        const rolesToken = claims ? claims['roles'] : null;
+       return this.isAuthenticated() && roles.includes(Role[rolesToken.toUpperCase() as keyof typeof Role]);
     }
 
     isAdmin(): boolean {
@@ -43,15 +46,13 @@ export class AuthService {
     }
 
     getMobile(): number {
-        return 0; //TODO...
+        const claims = this.oauthService.getIdentityClaims();
+        return claims ? claims['sub'] : null;
     }
 
     getName(): string {
-        return "???"; //TODO...
-    }
-
-    getToken(): string {
-        return this.oauthService.getAccessToken();
+        const claims = this.oauthService.getIdentityClaims();
+        return claims ? claims['name'] : null;
     }
 
 }

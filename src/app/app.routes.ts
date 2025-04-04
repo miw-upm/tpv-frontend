@@ -11,9 +11,13 @@ import {HomeComponent} from "./features/home/home.component";
 import {ProvidersComponent} from './features/shop/providers/providers.component';
 import {ShopComponent} from "./features/shop/shop.component";
 import {TicketsComponent} from './features/shop/cashier-opened/tickets/tickets.component';
+import {LoginCallbackComponent} from "@common/components/LoginCallbackComponent";
 
 export const routes: Routes = [
     {path: '', pathMatch: 'full', redirectTo: 'home/adviser'},
+    {
+        path: 'callback', component: LoginCallbackComponent
+    },
     {
         path: 'home', component: HomeComponent,
         children: [
