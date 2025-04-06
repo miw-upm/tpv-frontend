@@ -27,14 +27,14 @@ export class ShopComponent {
     cashierClosed: boolean;
 
     constructor(private readonly router: Router, private readonly dialog: MatDialog, private readonly httpService: HttpService,
-                private readonly tokensService: AuthService, private readonly sharedCashierService: SharedCashierService) {
-        this.username = tokensService.getName();
+                private readonly authService: AuthService, private readonly sharedCashierService: SharedCashierService) {
+        this.username = authService.getName();
         this.cashierClosed = true;
         this.cashier();
     }
 
     untilManager(): boolean {
-        return this.tokensService.untilManager();
+        return this.authService.untilManager();
     }
 
     cashier(): void {
@@ -55,7 +55,7 @@ export class ShopComponent {
     }
 
     logout(): void {
-        this.tokensService.logout();
+        this.authService.logout();
     }
 
     openCashier(): void {

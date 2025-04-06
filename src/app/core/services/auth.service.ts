@@ -1,32 +1,36 @@
 import {Injectable} from '@angular/core';
-import {Router} from '@angular/router';
 import {Role} from '@core/models/role.model';
-import {OAuthService} from "angular-oauth2-oidc";
+import {OidcSecurityService} from "angular-auth-oidc-client";
+
 
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
-    constructor(private readonly oauthService: OAuthService, private readonly router: Router) {
+    authenticated: boolean = false;
+    name: string = null;
+    mobile: number = 0;
+    roles: string = null;
+    constructor(private readonly oidcSecurityService: OidcSecurityService) {
     }
 
     login(): void {
-        console.log('Login pulsado...');
-        this.oauthService.initLoginFlow();
+        this.oidcSecurityService.authorize();
     }
 
     logout(): void {
-        this.oauthService.logOut();
-        console.log('Logout pulsado...' + this.isAuthenticated());
+        this.oidcSecurityService.logoff().subscribe( () => {
+            this.name = null;
+            this.mobile = 0;
+            this.roles = null;
+        });
     }
 
     isAuthenticated(): boolean {
-        return this.oauthService.hasValidAccessToken();
+        return this.authenticated;
     }
 
     hasRoles(roles: Role[]): boolean {
-        const claims = this.oauthService.getIdentityClaims();
-        const rolesToken = claims ? claims['roles'] : null;
-       return this.isAuthenticated() && roles.includes(Role[rolesToken.toUpperCase() as keyof typeof Role]);
+       return this.isAuthenticated() && roles.includes(Role[this.roles.toUpperCase() as keyof typeof Role]);
     }
 
     isAdmin(): boolean {
@@ -46,13 +50,11 @@ export class AuthService {
     }
 
     getMobile(): number {
-        const claims = this.oauthService.getIdentityClaims();
-        return claims ? claims['sub'] : null;
+        return this.mobile;
     }
 
     getName(): string {
-        const claims = this.oauthService.getIdentityClaims();
-        return claims ? claims['name'] : null;
+        return this.name
     }
 
 }

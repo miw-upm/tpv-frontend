@@ -1,44 +1,33 @@
 import {bootstrapApplication} from '@angular/platform-browser';
 import {AppComponent} from './app/app.component';
-import {AuthConfig, OAuthModule, OAuthService} from "angular-oauth2-oidc";
 import {importProvidersFrom, provideZoneChangeDetection} from "@angular/core";
 import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 import {provideHttpClient} from "@angular/common/http";
 import {provideRouter} from "@angular/router";
 import {routes} from "./app/app.routes";
+import {LogLevel, AuthModule} from "angular-auth-oidc-client";
 
-export const authConfig: AuthConfig = {
-    issuer: 'http://localhost:8081',
-    redirectUri: 'http://localhost:4200/callback',
-    clientId: 'spa-client-id',
-    responseType: 'code',
-    scope: 'openid profile',
-    logoutUrl: 'http://localhost:4200',
-    showDebugInformation: true,
-};
 
-(async () => {
-    const appRef = await bootstrapApplication(AppComponent, {
+bootstrapApplication(AppComponent, {
         providers: [
             provideZoneChangeDetection({eventCoalescing: true}),
             provideAnimationsAsync(),
             provideHttpClient(),
-            importProvidersFrom(OAuthModule.forRoot({
-                    resourceServer: {
-                        allowedUrls: ['http://localhost'], // URLs a las que se añade el token
-                        sendAccessToken: true
+            provideRouter(routes),
+            importProvidersFrom(
+                AuthModule.forRoot({
+                    config: {
+                        authority: 'http://localhost:8081',
+                        redirectUrl: window.location.origin + '/callback',
+                        postLogoutRedirectUri: window.location.origin,
+                        clientId: 'spa-client-id',
+                        scope: 'openid profile',
+                        responseType: 'code',
+                        silentRenew: true,
+                        useRefreshToken: true,
+                        logLevel: LogLevel.Debug,
                     }
-                }
-            )),
-            provideRouter(routes)
+                })
+            )
         ]
-    });
-
-    // Obtiene el servicio de OAuth desde el inyector de la aplicación
-    const injector = appRef.injector;
-    const oauthService = injector.get(OAuthService);
-
-    // Configura y carga el documento de descubrimiento, intentando el login
-    oauthService.configure(authConfig);
-    await oauthService.loadDiscoveryDocumentAndTryLogin();
-})();
+    }).catch((err) => console.error(err));
