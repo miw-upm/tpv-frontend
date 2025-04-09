@@ -27,7 +27,7 @@
             <span>Profile</span>
         </button>
         <button (click)="cart()" mat-button>
-            <mat-icon [matBadge]="cartItemCount" matBadgeColor="accent" matBadgeOverlap="false" matBadgeSize="medium">
+            <mat-icon [matBadge]="cartItemCount" aria-hidden="false" matBadgeColor="accent" matBadgeOverlap="false" matBadgeSize="medium">
                 shopping_cart
             </mat-icon>
         </button>

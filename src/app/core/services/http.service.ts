@@ -1,11 +1,18 @@
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams, HttpResponse} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {EMPTY, Observable, throwError} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
 import {AppError} from '@core/models/app-error.model';
+
+export interface HttpOptions {
+    headers: HttpHeaders;
+    params: HttpParams;
+    responseType: 'json' | 'blob';
+    observe: 'response';
+}
 
 @Injectable({providedIn: 'root'})
 export class HttpService {
@@ -14,9 +21,9 @@ export class HttpService {
 
     private headers: HttpHeaders;
     private params: HttpParams;
-    private responseType: string;
-    private successfulNotification = undefined;
-    private errorNotification = undefined;
+    private responseType:'json' | 'blob';
+    private successfulNotification: string | undefined;
+    private errorNotification: string | undefined;
 
     constructor(private readonly http: HttpClient, private readonly snackBar: MatSnackBar, private readonly router: Router) {
         this.resetOptions();
@@ -95,11 +102,11 @@ export class HttpService {
                 catchError(error => this.handleError(error)));
     }
 
-    authBasic(mobile: number, password: string): HttpService {
-        return this.header('Authorization', 'Basic ' + btoa(mobile + ':' + password));
+    authBasic(mobile: number, password: string): this {
+        return this.header('Authorization', 'Basic ' + btoa('${mobile}:${password}'));
     }
 
-    header(key: string, value: string): HttpService {
+    header(key: string, value: string): this {
         if (value != null) {
             this.headers = this.headers.append(key, value); // This class is immutable
         }
@@ -123,7 +130,7 @@ export class HttpService {
         return options;
     }
 
-    private extractData(response): any {
+    private extractData(response: any): any {
         if (this.successfulNotification) {
             this.snackBar.open(this.successfulNotification, '', {
                 duration: 2000
@@ -135,6 +142,7 @@ export class HttpService {
             if (contentType.indexOf('application/pdf') !== -1) {
                 const blob = new Blob([response.body], {type: 'application/pdf'});
                 window.open(window.URL.createObjectURL(blob));
+                return null;
             } else if (contentType.indexOf('application/json') !== -1) {
                 return response.body; // with 'text': JSON.parse(response.body);
             }
@@ -144,16 +152,12 @@ export class HttpService {
     }
 
     private showError(notification: string): void {
-        if (this.errorNotification) {
-            this.snackBar.open(this.errorNotification, 'Error', {duration: 5000});
-            this.errorNotification = undefined;
-        } else {
-            this.snackBar.open(notification, 'Error', {duration: 5000});
-        }
+        const message = this.errorNotification || notification;
+        this.snackBar.open(message, 'Error', { duration: 5000 });
+        this.errorNotification = undefined;
     }
 
-    private handleError(response): any {
-        let error: AppError;
+    private handleError(response):  Observable<never> {
         if (response.status === HttpService.UNAUTHORIZED) {
             this.showError('Unauthorized');
             this.router.navigate(['']).then();
@@ -163,7 +167,7 @@ export class HttpService {
             return EMPTY;
         } else {
             try {
-                error = response.error; // with 'text': JSON.parse(response.error);
+                const error = response.error; // with 'text': JSON.parse(response.error);
                 this.showError(error.error + ' (' + response.status + '): ' + error.message);
                 return throwError(() => error);
             } catch (e) {
