@@ -23,7 +23,7 @@ export class FooterComponent {
     constructor() {
         this.version = environment.VERSION;
         this.backEndUser = environment.REST_USER;
-        this.backEndCore = environment.REST_CORE;
+        this.backEndCore = environment.REST_ARTICLE;
     }
 
 }

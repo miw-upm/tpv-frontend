@@ -8,6 +8,7 @@ import {Article} from '../models/article.model';
 
 @Injectable({providedIn: 'root'})
 export class SharedArticleService {
+    private static readonly BARCODES = '/barcodes';
     private static readonly BARCODE = '/barcode';
 
     constructor(private readonly httpService: HttpService) {
@@ -15,7 +16,7 @@ export class SharedArticleService {
 
     read(barcode: string): Observable<Article> {
         return this.httpService
-            .get(EndPoints.ARTICLES + '/' + barcode);
+            .get(EndPoints.ARTICLES + SharedArticleService.BARCODE + '/' + barcode);
     }
 
     create(article: Article): Observable<Article> {
@@ -26,7 +27,7 @@ export class SharedArticleService {
     searchBarcode(barcode: string): Observable<number[]> {
         return this.httpService
             .param('barcode', barcode)
-            .get(EndPoints.ARTICLES + SharedArticleService.BARCODE)
+            .get(EndPoints.ARTICLES + SharedArticleService.BARCODES)
             .pipe(
                 map(response => response.barcodes)
             );

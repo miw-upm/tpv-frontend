@@ -17,6 +17,7 @@ import {MatInput} from '@angular/material/input';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {FormsModule} from '@angular/forms';
 import {MatCheckbox} from '@angular/material/checkbox';
+import {SharedUserService} from "../../shared/services/shared.user.service";
 
 @Component({
     standalone: true,
@@ -47,7 +48,7 @@ export class CheckOutDialogComponent {
     requestedDataProtectionAct = false;
 
     constructor(@Inject(MAT_DIALOG_DATA) data, private readonly dialogRef: MatDialogRef<CheckOutDialogComponent>,
-                private readonly shoppingCartService: ShoppingCartService) {
+                private readonly shoppingCartService: ShoppingCartService, private readonly sharedUserService: SharedUserService,) {
         this.ticketCreation = {cash: 0, card: 0, voucher: 0, shoppingList: data, note: ''};
         this.total();
     }
@@ -66,8 +67,8 @@ export class CheckOutDialogComponent {
 
     searchUser(mobile: string): void {
         if (mobile) {
+            this.sharedUserService.findByMobile(mobile).subscribe(user => this.ticketCreation.user = user)
             // TODO falta buscar el user en BD, si no existe, debe sacar un dialogo para crearlo
-            this.ticketCreation.user = {mobile: Number(mobile)};
         }
     }
 
